@@ -1,8 +1,11 @@
 package com.example.sahil.notty
 
+import android.app.AlertDialog
 import android.app.SearchManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -122,15 +125,26 @@ class MainActivity : AppCompatActivity() {
 
         override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
 
-            var myView=layoutInflater.inflate(R.layout.ticcket,null)
+            var myView=layoutInflater.inflate(R.layout.ticcket, null)
             var myNote=listNotesAdpater[p0]
             myView.tvTitle.text=myNote.nodeName
             myView.tvDes.text=myNote.nodeDes
             myView.ivDelete.setOnClickListener( View.OnClickListener {
-                var dbManager=DbManager(this.context!!)
-                val selectionArgs= arrayOf(myNote.nodeID.toString())
-                dbManager.Delete("ID=?",selectionArgs)
-                LoadQuery("%")
+                AlertDialog.Builder(this@MainActivity)
+                        .setIcon(android.R.drawable.ic_menu_delete)
+                        .setTitle("Are you sure!")
+                        .setMessage("Do you definitely want to delete this note?")
+                        .setPositiveButton("Yes"){_, _ ->
+                            Toast.makeText(this@MainActivity,"Selected note is deleted",Toast.LENGTH_SHORT).show()
+                            var dbManager=DbManager(this@MainActivity)
+                            val selectionArgs= arrayOf(myNote.nodeID.toString())
+                            dbManager.Delete("ID=?",selectionArgs)
+                            LoadQuery("%")
+                        }
+                        .setNegativeButton("No"){_, _ ->
+                            Toast.makeText(this@MainActivity,"Selected note is not deleted",Toast.LENGTH_SHORT).show()
+                        }
+                        .show()
             })
             myView.ivEdit.setOnClickListener( View.OnClickListener{
 
